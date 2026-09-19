@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>고양이 선택</title>
+    <meta name="description" content="세 고양이 중 하나를 고르는 선택 실험">
+    <link rel="stylesheet" href="./styles.css?v=13">
+  </head>
+  <body>
+    <main class="experiment" aria-label="고양이 선택 실험">
+      <button id="reset-button" class="reset-button" type="button" aria-label="다시 시작" title="다시 시작">
+        <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path>
+          <path d="M3 3v5h5"></path>
+        </svg>
+      </button>
+
+      <div class="cat-row" id="cat-row" aria-label="선택 가능한 고양이">
+        <button class="cat-card cat-one" type="button" data-choice="a" aria-label="첫 번째 고양이" aria-pressed="false">
+          <svg class="cat-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 5c-1.5-1.7-4-3-5.5-3-.3 1.6-.2 3.3.4 4.6A7 7 0 0 0 5 11.5V14c0 4.4 3.1 8 7 8s7-3.6 7-8v-2.5a7 7 0 0 0-1.9-4.9c.6-1.3.7-3 .4-4.6C16 2 13.5 3.3 12 5Z"></path>
+            <path class="coat-detail" d="m9.2 5 1 2.2M12 4.5v2.7M14.8 5l-1 2.2"></path>
+            <path class="coat-detail" d="m6.4 9.2 2 .8M17.6 9.2l-2 .8"></path>
+            <path d="M8 13v.01M16 13v.01M10 17h4"></path>
+          </svg>
+        </button>
+        <button class="cat-card cat-two" type="button" data-choice="b" aria-label="두 번째 고양이" aria-pressed="false">
+          <svg class="cat-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 5c-1.5-1.7-4-3-5.5-3-.3 1.6-.2 3.3.4 4.6A7 7 0 0 0 5 11.5V14c0 4.4 3.1 8 7 8s7-3.6 7-8v-2.5a7 7 0 0 0-1.9-4.9c.6-1.3.7-3 .4-4.6C16 2 13.5 3.3 12 5Z"></path>
+            <circle class="coat-fill" cx="9" cy="8.5" r="1.6"></circle>
+            <circle class="coat-fill" cx="15.7" cy="10" r="1.2"></circle>
+            <circle class="coat-fill" cx="8" cy="17" r="1.3"></circle>
+            <path d="M8 13v.01M16 13v.01M10 17h4"></path>
+          </svg>
+        </button>
+        <button class="cat-card cat-three" type="button" data-choice="c" aria-label="세 번째 고양이" aria-pressed="false">
+          <svg class="cat-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 5c-1.5-1.7-4-3-5.5-3-.3 1.6-.2 3.3.4 4.6A7 7 0 0 0 5 11.5V14c0 4.4 3.1 8 7 8s7-3.6 7-8v-2.5a7 7 0 0 0-1.9-4.9c.6-1.3.7-3 .4-4.6C16 2 13.5 3.3 12 5Z"></path>
+            <path class="coat-fill" d="M7 6.5c1.4-1.4 3-2.1 5-2.1s3.6.7 5 2.1l-2.3 3.2L12 7.8 9.3 9.7 7 6.5Z"></path>
+            <path class="coat-detail" d="m9.2 18 2.8-2.4 2.8 2.4M12 7.8v3"></path>
+            <path d="M8 13v.01M16 13v.01M10 17h4"></path>
+          </svg>
+        </button>
+      </div>
+
+      <p class="result" id="result-text" role="status" aria-live="polite"></p>
+    </main>
+
+    <script src="./app.js?v=13" defer></script>
+  </body>
+</html>
