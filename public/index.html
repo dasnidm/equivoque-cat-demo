@@ -5,10 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>고양이 선택</title>
     <meta name="description" content="세 고양이 중 하나를 고르는 선택 실험">
-    <link rel="stylesheet" href="./styles.css?v=13">
+    <link rel="stylesheet" href="./styles.css?v=14">
   </head>
   <body>
     <main class="experiment" aria-label="고양이 선택 실험">
+      <nav class="mode-switch" aria-label="실험 모드">
+        <button type="button" data-mode="classic" aria-pressed="true">기존 모드</button>
+        <button type="button" data-mode="pet" aria-pressed="false">쓰다듬기 <span>v2</span></button>
+      </nav>
+      <header class="pet-intro" hidden>
+        <p class="eyebrow">A LITTLE CONNECTION</p>
+        <h1>당신의 고양이를 찾아봅시다!</h1>
+        <p>고양이를 쓰다듬어주세요.</p>
+        <small>손가락이나 마우스로 살짝 쓸어주세요 · 탭도 가능해요</small>
+      </header>
       <button id="reset-button" class="reset-button" type="button" aria-label="다시 시작" title="다시 시작">
         <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path>
@@ -47,6 +57,6 @@
       <p class="result" id="result-text" role="status" aria-live="polite"></p>
     </main>
 
-    <script src="./app.js?v=13" defer></script>
+    <script src="./app.js?v=14" defer></script>
   </body>
 </html>
