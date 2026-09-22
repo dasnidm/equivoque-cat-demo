@@ -23,6 +23,7 @@ let state = createInitialState();
 let confirmationTimer = null;
 let completionTimer = null;
 let gesture = null;
+let tapTimer = null;
 const reactionTimers = new Map();
 const departures = new Set();
 
@@ -255,7 +256,7 @@ function handlePetChoice(choice) {
 
 function render() {
   const oldRects = new Map(cards.filter(card => !card.hidden).map(card => [card, card.getBoundingClientRect()]));
-  const isConfirming = state.phase === "confirming";
+  const isConfirming = state.phase === "confirming" || tapTimer !== null;
   const isClearing = state.phase === "clearing";
   const isFading = state.phase === "fading";
   const isCentering = state.phase === "centering";
@@ -314,6 +315,7 @@ function commitRender() {
 
 function handleChoice(choice) {
   if (
+    tapTimer !== null ||
     state.phase === "escaping" ||
     state.phase === "confirming" ||
     state.phase === "clearing" ||
@@ -362,9 +364,19 @@ cards.forEach((card) => {
   });
   card.addEventListener("click", (event) => {
     if (event.detail > 0 && performance.now() < suppressClickUntil) return;
-    if (mode !== "classic" && !card.disabled) reactToPet(card);
+    if (card.disabled) return;
     const choice = card.dataset.choice;
-    if (choice !== undefined) {
+    if (mode !== "classic") {
+      reactToPet(card);
+      if (!state.selected.includes(choice)) {
+        // A tap has no stroking interval: let its tactile feedback finish first.
+        tapTimer = setTimeout(() => {
+          tapTimer = null;
+          handleChoice(choice);
+        }, prefersReducedMotion ? REDUCED_PHASE_DELAY_MS : 550);
+        render();
+      }
+    } else if (choice !== undefined) {
       handleChoice(choice);
     }
 
@@ -375,6 +387,8 @@ cards.forEach((card) => {
 });
 
 function resetExperiment() {
+  clearTimeout(tapTimer);
+  tapTimer = null;
   clearGesture();
   departures.forEach(({ ghost, animation }) => { animation.cancel(); ghost.remove(); });
   departures.clear();
