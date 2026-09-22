@@ -18,6 +18,7 @@ const INITIAL_STATE = {
 
 let mode = "classic";
 let catCount = 3;
+let randomPosition = false;
 let state = createInitialState();
 let confirmationTimer = null;
 let completionTimer = null;
@@ -297,7 +298,7 @@ function render() {
   });
 
   resultText.textContent = state.complete
-    ? (mode !== "classic" ? "You found your cat." : "You chose the first cat.")
+    ? (mode !== "classic" ? "You found your cat." : randomPosition ? "You chose this cat." : "You chose the first cat.")
     : "";
   resultText.classList.toggle("shown", state.complete);
 }
@@ -386,8 +387,25 @@ function resetExperiment() {
   clearTimeout(completionTimer);
   completionTimer = null;
   state = createInitialState();
+  const activeCards = cards.filter(card => state.visible.includes(card.dataset.choice));
+  if (randomPosition) {
+    for (let i = activeCards.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [activeCards[i], activeCards[j]] = [activeCards[j], activeCards[i]];
+    }
+  }
+  catRow.append(...activeCards, ...cards.filter(card => !state.visible.includes(card.dataset.choice)));
+  catRow.classList.toggle("randomized", randomPosition);
   commitRender();
 }
+
+document.querySelector("#random-position").addEventListener("click", (event) => {
+  randomPosition = !randomPosition;
+  const button = event.currentTarget;
+  button.setAttribute("aria-pressed", String(randomPosition));
+  button.querySelector("span").textContent = randomPosition ? "On" : "Off";
+  resetExperiment();
+});
 
 document.querySelectorAll("[data-mode]").forEach((button) => {
   button.addEventListener("click", () => {

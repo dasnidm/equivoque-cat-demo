@@ -247,6 +247,12 @@ button {
 .count-switch button { width: 34px; height: 35px; border: 0; border-radius: 50%; background: transparent; color: #74756e; cursor: pointer; font-size: 13px; }
 .count-switch button[aria-pressed="true"] { background: #fffdf9; color: #294a3e; box-shadow: 0 2px 8px #26362a0d; font-weight: 650; }
 .count-switch button:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 2px; }
+.random-toggle { border: 1px solid var(--border-default); border-radius: 100px; background: #e9e6df; color: #626b60; padding: 12px 15px; font-size: 12px; cursor: pointer; }
+.random-toggle span { display: inline-block; min-width: 24px; margin-left: 7px; font-size: 11px; }
+.random-toggle[aria-pressed="true"] { background: #e2ecdc; border-color: #90a287; color: #294a3e; }
+.random-toggle:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 2px; }
+.cat-row.randomized.centering .removed, .cat-row.randomized.complete .removed { display: none; }
+.cat-row.randomized.centering.fallback-motion .cat-card[data-choice="a"] { animation: none; }
 .pet-mode .cat-row { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; }
 .pet-mode .cat-row .cat-card { flex: 0 0 auto; width: calc((100% - (var(--cat-count) - 1) * var(--cat-gap)) / var(--cat-count)); }
 .pet-mode .cat-row.centering .cat-card[data-choice="a"], .pet-mode .cat-row.complete .cat-card[data-choice="a"] { grid-column: 1 / -1; width: calc((100% - (var(--cat-count) - 1) * var(--cat-gap)) / var(--cat-count)); justify-self: center; }
