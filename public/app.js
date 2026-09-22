@@ -23,8 +23,9 @@ let confirmationTimer = null;
 let completionTimer = null;
 let gesture = null;
 const reactionTimers = new Map();
+const departures = new Set();
 
-for (const [choice, label, colorClass] of [["d", "네 번째 고양이", "cat-four"], ["e", "다섯 번째 고양이", "cat-five"]]) {
+for (const [choice, label, colorClass] of [["d", "Fourth cat", "cat-four"], ["e", "Fifth cat", "cat-five"]]) {
   const card = document.createElement("button");
   card.type = "button";
   card.className = `cat-card ${colorClass}`;
@@ -63,7 +64,7 @@ cards.forEach((card, index) => {
           </g>
         </g>
       </svg>
-      <span class="pet-spark">✦</span><span class="pet-mark">쓰다듬었어요</span>
+      <span class="pet-spark">✦</span><span class="pet-mark">Petted</span>
     </span>`);
 });
 
@@ -91,7 +92,7 @@ function createInitialState() {
   return {
     ...INITIAL_STATE,
     selected: [...INITIAL_STATE.selected],
-    visible: ["a", "b", "c", "d", "e"].slice(0, mode === "pet" ? catCount : 3),
+    visible: ["a", "b", "c", "d", "e"].slice(0, mode !== "classic" ? catCount : 3),
   };
 }
 
@@ -174,7 +175,7 @@ function handleNarrowedChoice(choice) {
 }
 
 function updateState(choice) {
-  if (mode === "pet") {
+  if (mode !== "classic") {
     handlePetChoice(choice);
     return;
   }
@@ -187,9 +188,52 @@ function updateState(choice) {
   }
 }
 
+function resolveRunGroup(retained) {
+  const leaving = cards.filter(card => state.visible.includes(card.dataset.choice) && !retained.includes(card.dataset.choice));
+  if (!prefersReducedMotion) leaving.forEach(card => {
+    const rect = card.getBoundingClientRect();
+    const ghost = card.cloneNode(true);
+    ghost.hidden = false;
+    ghost.disabled = true;
+    ghost.setAttribute("aria-hidden", "true");
+    ghost.removeAttribute("aria-label");
+    ghost.classList.remove("selected", "purring", "stroking");
+    ghost.classList.add("running-away");
+    Object.assign(ghost.style, { position: "fixed", left: `${rect.left}px`, top: `${rect.top}px`, width: `${rect.width}px`, height: `${rect.height}px`, margin: "0", zIndex: "20" });
+    document.body.append(ghost);
+    const direction = rect.left + rect.width / 2 < innerWidth / 2 ? -1 : 1;
+    ghost.style.setProperty("--run-facing", direction);
+    const distance = direction < 0 ? -(rect.right + 60) : innerWidth - rect.left + 60;
+    const animation = ghost.animate([{ transform: "translateX(0)" }, { transform: `translateX(${distance}px)` }], { duration: 820, easing: "cubic-bezier(.4,0,.8,.6)", fill: "forwards" });
+    const departure = { ghost, animation };
+    departures.add(departure);
+    animation.onfinish = () => { ghost.remove(); departures.delete(departure); };
+  });
+  state.visible = retained;
+  state.selected = [];
+  state.phase = "escaping";
+  completionTimer = setTimeout(() => {
+    completionTimer = null;
+    state.complete = retained.length === 1;
+    state.phase = state.complete ? "complete" : "initial";
+    render();
+  }, prefersReducedMotion ? 0 : 840);
+}
+
 function handlePetChoice(choice) {
   if (state.selected.includes(choice)) return;
   const selection = [...state.selected, choice];
+  if (mode === "run") {
+    if (choice === TARGET_CHOICE) {
+      resolveRunGroup(state.visible.filter(item => selection.includes(item)));
+    } else if (selection.length === state.visible.length - 1) {
+      resolveRunGroup([TARGET_CHOICE]);
+    } else {
+      state.selected = selection;
+      state.phase = "collecting";
+    }
+    return;
+  }
   if (choice === TARGET_CHOICE) {
     beginConfirmation(choice, () => {
       if (selection.length === 1) {
@@ -209,12 +253,13 @@ function handlePetChoice(choice) {
 }
 
 function render() {
+  const oldRects = new Map(cards.filter(card => !card.hidden).map(card => [card, card.getBoundingClientRect()]));
   const isConfirming = state.phase === "confirming";
   const isClearing = state.phase === "clearing";
   const isFading = state.phase === "fading";
   const isCentering = state.phase === "centering";
-  const isFinalizing = isClearing || isFading || isCentering;
-  const count = mode === "pet" ? catCount : 3;
+  const isFinalizing = isClearing || isFading || isCentering || state.phase === "escaping";
+  const count = mode !== "classic" ? catCount : 3;
   catRow.style.setProperty("--cat-count", count);
   catRow.dataset.count = count;
 
@@ -226,7 +271,7 @@ function render() {
 
   cards.forEach((card) => {
     const choice = card.dataset.choice;
-    card.hidden = ["a", "b", "c", "d", "e"].indexOf(choice) >= count;
+    card.hidden = ["a", "b", "c", "d", "e"].indexOf(choice) >= count || (mode !== "classic" && !state.visible.includes(choice));
     const isVisible = state.visible.includes(choice);
     const isSelected = state.selected.includes(choice);
     const isFinalTarget = (isFinalizing || state.complete) && choice === TARGET_CHOICE;
@@ -238,14 +283,25 @@ function render() {
     card.setAttribute("aria-pressed", String(isSelected || isFinalTarget));
   });
 
+  if (mode !== "classic" && !prefersReducedMotion) cards.forEach(card => {
+    const before = oldRects.get(card);
+    if (!before || card.hidden) return;
+    const after = card.getBoundingClientRect();
+    const dx = before.left - after.left;
+    const dy = before.top - after.top;
+    if (Math.abs(dx) + Math.abs(dy) > 1) card.animate([
+      { translate: `${dx}px ${dy}px` }, { translate: "0px 0px" }
+    ], { duration: 420, easing: "ease-out" });
+  });
+
   resultText.textContent = state.complete
-    ? (mode === "pet" ? "당신의 고양이를 찾았어요." : "당신은 첫 번째 고양이를 골랐습니다.")
+    ? (mode !== "classic" ? "You found your cat." : "You chose the first cat.")
     : "";
   resultText.classList.toggle("shown", state.complete);
 }
 
 function commitRender() {
-  if (supportsViewTransitions && state.phase === "centering" && !prefersReducedMotion) {
+  if (mode === "classic" && supportsViewTransitions && state.phase === "centering" && !prefersReducedMotion) {
     document.startViewTransition(render);
     return;
   }
@@ -255,6 +311,7 @@ function commitRender() {
 
 function handleChoice(choice) {
   if (
+    state.phase === "escaping" ||
     state.phase === "confirming" ||
     state.phase === "clearing" ||
     state.phase === "fading" ||
@@ -272,7 +329,7 @@ function handleChoice(choice) {
 cards.forEach((card) => {
   let suppressClickUntil = 0;
   card.addEventListener("pointerdown", (event) => {
-    if (mode !== "pet" || card.disabled || !event.isPrimary || event.button !== 0 || gesture) return;
+    if (mode === "classic" || card.disabled || !event.isPrimary || event.button !== 0 || gesture) return;
     gesture = { card, id: event.pointerId, x: event.clientX, y: event.clientY, distance: 0 };
     card.setPointerCapture(event.pointerId);
     card.classList.add("stroking");
@@ -302,7 +359,7 @@ cards.forEach((card) => {
   });
   card.addEventListener("click", (event) => {
     if (event.detail > 0 && performance.now() < suppressClickUntil) return;
-    if (mode === "pet" && !card.disabled) reactToPet(card);
+    if (mode !== "classic" && !card.disabled) reactToPet(card);
     const choice = card.dataset.choice;
     if (choice !== undefined) {
       handleChoice(choice);
@@ -316,6 +373,9 @@ cards.forEach((card) => {
 
 function resetExperiment() {
   clearGesture();
+  departures.forEach(({ ghost, animation }) => { animation.cancel(); ghost.remove(); });
+  departures.clear();
+  cards.forEach(card => card.getAnimations().forEach(animation => animation.cancel()));
   reactionTimers.forEach(clearTimeout);
   reactionTimers.clear();
   cards.forEach((card) => card.classList.remove("purring", "stroking"));
@@ -331,9 +391,10 @@ document.querySelectorAll("[data-mode]").forEach((button) => {
   button.addEventListener("click", () => {
     if (mode === button.dataset.mode) return;
     mode = button.dataset.mode;
-    document.body.classList.toggle("pet-mode", mode === "pet");
-    document.querySelector(".pet-intro").hidden = mode !== "pet";
-    document.querySelector(".count-switch").hidden = mode !== "pet";
+    document.body.classList.toggle("pet-mode", mode !== "classic");
+    document.body.classList.toggle("run-mode", mode === "run");
+    document.querySelector(".pet-intro").hidden = mode === "classic";
+    document.querySelector(".count-switch").hidden = mode === "classic";
     document.querySelectorAll("[data-mode]").forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
     resetExperiment();
   });

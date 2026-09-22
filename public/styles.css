@@ -247,7 +247,8 @@ button {
 .count-switch button { width: 34px; height: 35px; border: 0; border-radius: 50%; background: transparent; color: #74756e; cursor: pointer; font-size: 13px; }
 .count-switch button[aria-pressed="true"] { background: #fffdf9; color: #294a3e; box-shadow: 0 2px 8px #26362a0d; font-weight: 650; }
 .count-switch button:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 2px; }
-.pet-mode .cat-row { grid-template-columns: repeat(var(--cat-count), minmax(0, 1fr)); }
+.pet-mode .cat-row { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; }
+.pet-mode .cat-row .cat-card { flex: 0 0 auto; width: calc((100% - (var(--cat-count) - 1) * var(--cat-gap)) / var(--cat-count)); }
 .pet-mode .cat-row.centering .cat-card[data-choice="a"], .pet-mode .cat-row.complete .cat-card[data-choice="a"] { grid-column: 1 / -1; width: calc((100% - (var(--cat-count) - 1) * var(--cat-gap)) / var(--cat-count)); justify-self: center; }
 .pet-mode .cat-row.centering.fallback-motion .cat-card[data-choice="a"] { animation: none; }
 .mode-switch button:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 2px; }
@@ -299,12 +300,31 @@ button {
   .mode-switch button { padding: 10px 12px; }
   .count-switch button { width: 30px; }
   .pet-mode .cat-row[data-count="4"], .pet-mode .cat-row[data-count="5"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pet-mode .cat-row[data-count="4"] .cat-card, .pet-mode .cat-row[data-count="5"] .cat-card { width: calc((100% - var(--cat-gap)) / 2); }
   .pet-mode .cat-row[data-count="4"] .cat-card, .pet-mode .cat-row[data-count="5"] .cat-card { aspect-ratio: 1.15; }
   .pet-mode .cat-row[data-count="4"].centering .cat-card[data-choice="a"], .pet-mode .cat-row[data-count="4"].complete .cat-card[data-choice="a"], .pet-mode .cat-row[data-count="5"].centering .cat-card[data-choice="a"], .pet-mode .cat-row[data-count="5"].complete .cat-card[data-choice="a"] { width: calc((100% - var(--cat-gap)) / 2); }
   .pet-mode .experiment { width: calc(100% - 28px); }
   .pet-mode .cat-card { padding: 2px; border-radius: 17px; aspect-ratio: 3 / 5; }
   .pet-mark { font-size: 9px; bottom: 12px; }
   .pet-intro small { font-size: 10px; }
+}
+
+/* The invisible button remains the touch target; only the cat is drawn. */
+.run-mode { overflow-x: clip; }
+.run-mode .cat-card, .run-mode .cat-card.selected, .run-mode .cat-card:not(:disabled):hover { background: transparent; border-color: transparent; box-shadow: none; overflow: visible; }
+.run-mode .cat-card { aspect-ratio: 1; padding: 0; }
+.run-mode .selected .pet-cat { filter: drop-shadow(0 4px 7px #70966b40); }
+.run-mode .pet-mark { bottom: 0; }
+.run-mode .running-away { pointer-events: none; }
+.run-mode .running-away .cat-body { animation: running-bounce 150ms ease-in-out infinite; }
+.run-mode .running-away .cat-head { animation: none; transform: rotate(7deg); }
+.run-mode .running-away .pet-cat { transform: scaleX(var(--run-facing)); }
+.run-mode .running-away .pet-mark, .run-mode .running-away .pet-spark { display: none; }
+@keyframes running-bounce { 0%, 100% { transform: translateY(0) rotate(-5deg); } 50% { transform: translateY(-12px) rotate(5deg); } }
+@media (max-width: 520px) {
+  .mode-switch { gap: 0; max-width: 100%; }
+  .mode-switch button { padding: 10px 9px; font-size: 11px; }
+  .run-mode .cat-row .cat-card { aspect-ratio: 1; }
 }
 @media (prefers-reduced-motion: reduce) {
   .cat-body, .cat-tail, .cat-eyes, .purring .cat-head, .purring .pet-spark { animation: none !important; }
