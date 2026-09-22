@@ -262,6 +262,7 @@ function render() {
   const count = mode !== "classic" ? catCount : 3;
   catRow.style.setProperty("--cat-count", count);
   catRow.dataset.count = count;
+  catRow.classList.toggle("five-layout", mode !== "classic" && state.visible.length === 5);
 
   catRow.classList.toggle("fading", isFading);
   catRow.classList.toggle("centering", isCentering);

@@ -326,6 +326,12 @@ button {
   .mode-switch button { padding: 10px 9px; font-size: 11px; }
   .run-mode .cat-row .cat-card { aspect-ratio: 1; }
 }
+/* Equal-size 2 + 3 arrangement at every viewport width. */
+.pet-mode .cat-row[data-count="5"] { width: 100%; max-width: 480px; justify-self: center; row-gap: 8px; }
+.pet-mode .cat-row[data-count="5"] .cat-card[data-choice] { width: calc((100% - 2 * var(--cat-gap)) / 3); aspect-ratio: 1; }
+.pet-mode .cat-row.five-layout::before { content: ""; flex-basis: 100%; height: 0; order: 1; }
+.pet-mode .cat-row.five-layout .cat-card { order: 2; }
+.pet-mode .cat-row.five-layout .cat-card:nth-child(-n+2) { order: 0; }
 @media (prefers-reduced-motion: reduce) {
   .cat-body, .cat-tail, .cat-eyes, .purring .cat-head, .purring .pet-spark { animation: none !important; }
   .stroking .cat-head { transform: none; }
