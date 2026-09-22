@@ -5,14 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>고양이 선택</title>
     <meta name="description" content="세 고양이 중 하나를 고르는 선택 실험">
-    <link rel="stylesheet" href="./styles.css?v=14">
+    <link rel="stylesheet" href="./styles.css?v=15">
   </head>
   <body>
     <main class="experiment" aria-label="고양이 선택 실험">
+      <div class="experiment-controls">
       <nav class="mode-switch" aria-label="실험 모드">
         <button type="button" data-mode="classic" aria-pressed="true">기존 모드</button>
         <button type="button" data-mode="pet" aria-pressed="false">쓰다듬기 <span>v2</span></button>
       </nav>
+      <div class="count-switch" role="group" aria-label="고양이 수" hidden>
+        <button type="button" data-count="3" aria-label="고양이 3마리" aria-pressed="true">3</button>
+        <button type="button" data-count="4" aria-label="고양이 4마리" aria-pressed="false">4</button>
+        <button type="button" data-count="5" aria-label="고양이 5마리" aria-pressed="false">5</button>
+      </div>
+      </div>
       <header class="pet-intro" hidden>
         <p class="eyebrow">A LITTLE CONNECTION</p>
         <h1>당신의 고양이를 찾아봅시다!</h1>
@@ -57,6 +64,6 @@
       <p class="result" id="result-text" role="status" aria-live="polite"></p>
     </main>
 
-    <script src="./app.js?v=14" defer></script>
+    <script src="./app.js?v=15" defer></script>
   </body>
 </html>

@@ -16,13 +16,23 @@ const INITIAL_STATE = {
   complete: false,
 };
 
+let mode = "classic";
+let catCount = 3;
 let state = createInitialState();
 let confirmationTimer = null;
 let completionTimer = null;
-let mode = "classic";
 let gesture = null;
 const reactionTimers = new Map();
 
+for (const [choice, label, colorClass] of [["d", "네 번째 고양이", "cat-four"], ["e", "다섯 번째 고양이", "cat-five"]]) {
+  const card = document.createElement("button");
+  card.type = "button";
+  card.className = `cat-card ${colorClass}`;
+  card.dataset.choice = choice;
+  card.setAttribute("aria-label", label);
+  card.setAttribute("aria-pressed", "false");
+  document.querySelector("#cat-row").append(card);
+}
 const cards = Array.from(document.querySelectorAll(".cat-card"));
 const catRow = document.querySelector("#cat-row");
 const resultText = document.querySelector("#result-text");
@@ -81,7 +91,7 @@ function createInitialState() {
   return {
     ...INITIAL_STATE,
     selected: [...INITIAL_STATE.selected],
-    visible: [...INITIAL_STATE.visible],
+    visible: ["a", "b", "c", "d", "e"].slice(0, mode === "pet" ? catCount : 3),
   };
 }
 
@@ -164,6 +174,10 @@ function handleNarrowedChoice(choice) {
 }
 
 function updateState(choice) {
+  if (mode === "pet") {
+    handlePetChoice(choice);
+    return;
+  }
   if (state.phase === "initial") {
     handleInitialChoice(choice);
   } else if (state.phase === "second") {
@@ -173,12 +187,36 @@ function updateState(choice) {
   }
 }
 
+function handlePetChoice(choice) {
+  if (state.selected.includes(choice)) return;
+  const selection = [...state.selected, choice];
+  if (choice === TARGET_CHOICE) {
+    beginConfirmation(choice, () => {
+      if (selection.length === 1) {
+        beginFinalization();
+      } else {
+        state.visible = state.visible.filter((item) => selection.includes(item));
+        state.selected = [];
+        state.phase = "initial";
+      }
+    });
+  } else if (selection.length === state.visible.length - 1) {
+    beginConfirmation(choice, beginFinalization);
+  } else {
+    state.selected = selection;
+    state.phase = "collecting";
+  }
+}
+
 function render() {
   const isConfirming = state.phase === "confirming";
   const isClearing = state.phase === "clearing";
   const isFading = state.phase === "fading";
   const isCentering = state.phase === "centering";
   const isFinalizing = isClearing || isFading || isCentering;
+  const count = mode === "pet" ? catCount : 3;
+  catRow.style.setProperty("--cat-count", count);
+  catRow.dataset.count = count;
 
   catRow.classList.toggle("fading", isFading);
   catRow.classList.toggle("centering", isCentering);
@@ -188,6 +226,7 @@ function render() {
 
   cards.forEach((card) => {
     const choice = card.dataset.choice;
+    card.hidden = ["a", "b", "c", "d", "e"].indexOf(choice) >= count;
     const isVisible = state.visible.includes(choice);
     const isSelected = state.selected.includes(choice);
     const isFinalTarget = (isFinalizing || state.complete) && choice === TARGET_CHOICE;
@@ -294,7 +333,18 @@ document.querySelectorAll("[data-mode]").forEach((button) => {
     mode = button.dataset.mode;
     document.body.classList.toggle("pet-mode", mode === "pet");
     document.querySelector(".pet-intro").hidden = mode !== "pet";
+    document.querySelector(".count-switch").hidden = mode !== "pet";
     document.querySelectorAll("[data-mode]").forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+    resetExperiment();
+  });
+});
+
+document.querySelectorAll("[data-count]").forEach((button) => {
+  button.addEventListener("click", () => {
+    const nextCount = Number(button.dataset.count);
+    if (catCount === nextCount) return;
+    catCount = nextCount;
+    document.querySelectorAll("button[data-count]").forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
     resetExperiment();
   });
 });

@@ -242,6 +242,14 @@ button {
 .mode-switch button { border: 0; border-radius: 100px; padding: 10px 19px; color: #74756e; background: transparent; cursor: pointer; font-size: 13px; font-weight: 650; }
 .mode-switch button[aria-pressed="true"] { background: #fffdf9; color: #294a3e; box-shadow: 0 2px 8px #26362a0d; }
 .mode-switch span { font-size: 10px; margin-left: 4px; opacity: .65; }
+.experiment-controls { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+.count-switch { display: flex; gap: 3px; padding: 5px; border: 1px solid var(--border-default); border-radius: 100px; background: #e9e6df; }
+.count-switch button { width: 34px; height: 35px; border: 0; border-radius: 50%; background: transparent; color: #74756e; cursor: pointer; font-size: 13px; }
+.count-switch button[aria-pressed="true"] { background: #fffdf9; color: #294a3e; box-shadow: 0 2px 8px #26362a0d; font-weight: 650; }
+.count-switch button:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 2px; }
+.pet-mode .cat-row { grid-template-columns: repeat(var(--cat-count), minmax(0, 1fr)); }
+.pet-mode .cat-row.centering .cat-card[data-choice="a"], .pet-mode .cat-row.complete .cat-card[data-choice="a"] { grid-column: 1 / -1; width: calc((100% - (var(--cat-count) - 1) * var(--cat-gap)) / var(--cat-count)); justify-self: center; }
+.pet-mode .cat-row.centering.fallback-motion .cat-card[data-choice="a"] { animation: none; }
 .mode-switch button:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 2px; }
 .pet-art { display: none; }
 .pet-mode { background: radial-gradient(ellipse at 50% 40%, #fffdf7 0%, #f2eee5 80%); }
@@ -260,6 +268,8 @@ button {
 .pet-mode .cat-one { --cat-color: #bd9071; }
 .pet-mode .cat-two { --cat-color: #889f9d; }
 .pet-mode .cat-three { --cat-color: #787b85; }
+.pet-mode .cat-four { --cat-color: #bd9d67; }
+.pet-mode .cat-five { --cat-color: #aa8799; }
 .cat-body { transform-origin: 90px 153px; animation: cat-breathe 3.8s ease-in-out infinite; }
 .cat-head { transform-origin: 90px 116px; }
 .cat-tail { transform-origin: 121px 141px; animation: tail-sway 4s ease-in-out infinite; }
@@ -285,6 +295,12 @@ button {
 @keyframes purr { 0%, 100% { transform: rotate(0); } 20%, 60% { transform: rotate(-3deg) translateY(-2px); } 40%, 80% { transform: rotate(3deg) translateY(-2px); } }
 @keyframes spark-rise { 0% { opacity: 0; transform: translateY(8px) scale(.5); } 30% { opacity: 1; } 100% { opacity: 0; transform: translateY(-15px) scale(1.1); } }
 @media (max-width: 520px) {
+  .experiment-controls { gap: 6px; }
+  .mode-switch button { padding: 10px 12px; }
+  .count-switch button { width: 30px; }
+  .pet-mode .cat-row[data-count="4"], .pet-mode .cat-row[data-count="5"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pet-mode .cat-row[data-count="4"] .cat-card, .pet-mode .cat-row[data-count="5"] .cat-card { aspect-ratio: 1.15; }
+  .pet-mode .cat-row[data-count="4"].centering .cat-card[data-choice="a"], .pet-mode .cat-row[data-count="4"].complete .cat-card[data-choice="a"], .pet-mode .cat-row[data-count="5"].centering .cat-card[data-choice="a"], .pet-mode .cat-row[data-count="5"].complete .cat-card[data-choice="a"] { width: calc((100% - var(--cat-gap)) / 2); }
   .pet-mode .experiment { width: calc(100% - 28px); }
   .pet-mode .cat-card { padding: 2px; border-radius: 17px; aspect-ratio: 3 / 5; }
   .pet-mark { font-size: 9px; bottom: 12px; }
